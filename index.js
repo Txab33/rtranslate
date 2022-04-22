@@ -1,17 +1,19 @@
 const Discord = require('discord.js');
 require('discord-reply');
+const {StringUtils} = require('turbocommons-ts');
 const client = new Discord.Client();
 const translate = require('@vitalets/google-translate-api');
 const LanguageDetect = new (require('languagedetect'))();
 
 //config
 const prefix = '?'; // just an example, change to whatever you want
-const token = "your_token"
+const token = "OTY2NzYzODEwNzgwMjI1NTU3.YmGe9g.AOzPe4PDeWN-HtQHsr_TlEaRvcg"
 const activities = [
     "with translated stuff",
     "with languages",
     "with 1s and 0s"
 ];
+const similaritypurcentage = 90; // if translation is 90% similar, don't send.
 
 
 //onready
@@ -62,6 +64,7 @@ client.on('message', message => {
             q.push(() => {
                 translate(mess, { to: "en" }).then(res => {
                     if (res.from.language.iso == "en" || res.text.toLocaleLowerCase() == mess.toLocaleLowerCase()) return;
+                    if (StringUtils.compareSimilarityPercent(res.text.toLocaleLowerCase(), mess.toLocaleLowerCase()) >= similaritypurcentage) return;
                     const word = filter.clean(res.text)
                     if (word.replace(/\\\*/g, "").trim().length < 1) return;
                     message.lineReplyNoMention(word); // OUTPUT: You are amazing!
